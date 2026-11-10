@@ -18,3 +18,7 @@ ColaPTB/
 *.glb
 *.jks
 *.keystore
+
+# CI deployment staging
+.deploy/
+.deployment/

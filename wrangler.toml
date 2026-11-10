@@ -1,3 +1,8 @@
 name = "cola-photobooth"
 pages_build_output_dir = "./dist"
 compatibility_date = "2026-11-06"
+
+# Existing production download route uses this binding.
+[[r2_buckets]]
+binding = "APK_BUCKET"
+bucket_name = "cola-ptb-updates"

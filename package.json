@@ -1,0 +1,12 @@
+{
+  "name": "cola-photobooth-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node --check dist/app.js && node --check scripts/prepare-deploy.mjs",
+    "prepare:deploy": "node scripts/prepare-deploy.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.160.0"
+  }
+}
