@@ -55,6 +55,7 @@
       <div class="stage-top">
         <p id="hint" class="hint" aria-live="polite">Canh mặt vào ô sáng — đó là phần sẽ lên ảnh</p>
         <button type="button" class="mirror-btn mirror-mobile" aria-label="Lật ảnh">⇄</button>
+        <span class="light-wrap t-desk"><button type="button" class="light-switch" role="switch" aria-checked="false"><span class="track" aria-hidden="true"><i></i></span><span>Đèn màn hình</span></button></span>
         <span class="switch-wrap"><button type="button" class="lips-switch" role="switch" aria-checked="true"><span class="track" aria-hidden="true"><i></i></span><span class="t-desk">Son môi nhẹ</span><span class="t-mob">Son môi</span></button></span>
       </div>
 
@@ -62,7 +63,13 @@
         <div class="camera" id="camera">
           <video id="video" autoplay playsinline muted></video>
           <canvas id="makeup" aria-hidden="true"></canvas>
-          <div id="guide" class="guide" hidden aria-hidden="true"><span class="guide-grid"></span><span class="face-oval" id="faceOval"></span><span class="guide-label" id="guideLabel"></span></div>
+          <div id="guide" class="guide" hidden aria-hidden="true"><span class="guide-grid"></span><span class="face-oval" id="faceOval"></span><span class="face-hint" id="faceHint" hidden></span><span class="guide-label" id="guideLabel"></span></div>
+          <div class="cam-chips">
+            <button type="button" class="chip-cam light-chip t-mob light-switch" role="switch" aria-checked="false">☀ Đèn màn hình</button>
+            <span class="chip-cam rec-chip" id="recChip" hidden><i aria-hidden="true"></i> Đang quay clip</span>
+          </div>
+          <button type="button" class="chip-cam dark-chip" id="darkChip" hidden>Hơi tối? Bật “Đèn màn hình” để mặt sáng hơn</button>
+          <div class="review" id="review" hidden><img id="reviewImg" alt=""><div><b id="reviewText">Tấm 1 xong ✓</b><button type="button" class="ghost" id="reviewRetake">↻ Chụp lại tấm này</button></div></div>
           <div id="placeholder" class="placeholder">
             <div class="doodle" aria-hidden="true">✧ &nbsp; ▣ &nbsp; ✧</div>
             <h3>Một chút chuẩn bị...</h3>
@@ -104,13 +111,14 @@
 <section class="result-view" id="result" aria-label="Thành quả của bạn">
   <div class="result-display">
     <span class="star" aria-hidden="true">✳</span>
-    <div class="result-strip"><span class="tape" aria-hidden="true"></span><img id="resultImg" alt="Dải ảnh photobooth của bạn. Chạm vào một ô để chụp lại tấm đó."></div>
+    <div class="result-strip"><span class="tape" aria-hidden="true"></span><img id="resultImg" alt="Dải ảnh photobooth của bạn. Chạm vào một ô để chụp lại tấm đó."><canvas id="motionCanvas" hidden role="img" aria-label="Ảnh động của bạn. Chạm vào một ô để chụp lại tấm đó."></canvas><span class="motion-badge" id="motionBadge" hidden>▶ Ảnh động</span></div>
     <div class="scribble" aria-hidden="true">a little piece<br>of happiness ↗</div>
   </div>
   <div class="result-side">
     <h1><span class="t-desk">Những điều xinh xắn<br><em>đáng được giữ lại.</em></span><span class="t-mob">Xinh quá đi!</span></h1>
     <p class="result-desc t-desk">Chưa ưng chỗ nào thì chỉnh ngay ở đây, không cần chụp lại cả lượt.</p>
     <p class="result-desc t-mob">Chạm vào một ô ảnh nếu muốn chụp lại tấm đó.</p>
+    <div class="segmented mode-switch" id="modeSwitch" role="group" aria-label="Kiểu thành quả" hidden><button type="button" data-mode="still" class="active" aria-pressed="true">Ảnh tĩnh</button><button type="button" data-mode="motion" aria-pressed="false">Ảnh động · video</button></div>
     <div class="panel result-panel">
       <div class="r-group r-shots"><h2 class="panel-title">Ảnh đã chụp</h2><div id="shots" class="shots"></div></div>
       <div class="r-group"><h2 class="panel-title">Đổi khung</h2><div id="resultFrames" class="frames frames-row" role="group" aria-label="Đổi khung"></div><p class="using">Đang dùng: <b id="frameName">Hoa ép</b></p></div>
@@ -119,13 +127,15 @@
         <button type="button" class="layout-toggle t-mob" id="layoutToggle" aria-expanded="false" aria-controls="resultLayouts">Bố cục: <b id="layoutName">Dải bốn</b> <span aria-hidden="true">▾</span></button>
         <div id="resultLayouts" class="layout-options" role="group" aria-label="Đổi bố cục"></div>
       </div>
-      <div class="r-group r-lips"><div><h2 class="panel-title">Son môi trên ảnh</h2><p>Bật hoặc tắt cho cả <span id="lipsCount">4</span> tấm đã chụp</p></div><span class="switch-wrap"><button type="button" class="lips-switch" role="switch" aria-checked="true" aria-label="Son môi trên ảnh"><span class="track" aria-hidden="true"><i></i></span></button></span></div>
+      <div class="r-group r-lips"><div><h2 class="panel-title">Son môi trên ảnh</h2><p>Bật hoặc tắt cho cả <span id="lipsCount">4</span> tấm đã chụp</p><p class="motion-only lips-motion-note">Ảnh động giữ son như lúc quay</p></div><span class="switch-wrap"><button type="button" class="lips-switch" role="switch" aria-checked="true" aria-label="Son môi trên ảnh"><span class="track" aria-hidden="true"><i></i></span></button></span></div>
     </div>
     <div class="result-actions">
-      <button id="download" type="button" class="primary">↓ &nbsp;<span class="t-desk">Tải ảnh về máy</span><span class="t-mob">Lưu ảnh</span></button>
+      <button id="download" type="button" class="primary"><span id="downloadText">↓ Tải ảnh PNG</span></button>
+      <button id="share" type="button" class="outline share-btn" hidden>Chia sẻ</button>
       <button id="newSession" type="button" class="outline"><span class="t-desk">Chụp lượt mới</span><span class="t-mob">Chụp mới</span></button>
     </div>
-    <p class="local-note">Ảnh chỉ lưu trên máy của bạn ♡</p>
+    <p class="local-note" id="localNote">Ảnh 1800px, nét khi in · chỉ lưu trên máy của bạn ♡</p>
+    <p class="local-note webm-note" id="webmNote" hidden>Trình duyệt này chỉ lưu được WebM, iPhone có thể không mở được</p>
   </div>
   <div id="retakeAsk" class="retake-ask" hidden role="dialog" aria-modal="false" aria-labelledby="askText"><p id="askText">Chụp lại tấm này?</p><div><button type="button" class="outline" id="askNo">Thôi</button><button type="button" class="primary" id="askYes">Chụp lại</button></div></div>
 </section>
