@@ -1,0 +1,20 @@
+# Local credentials and deployment state
+.env
+.env.*
+!.env.example
+.wrangler/
+.openai/
+.DS_Store
+node_modules/
+
+# Native apps, updates, and unrelated 3D work
+android/
+ColaPTB/
+*.apk
+*.aab
+*.bin
+*.blend
+*.blend1
+*.glb
+*.jks
+*.keystore
